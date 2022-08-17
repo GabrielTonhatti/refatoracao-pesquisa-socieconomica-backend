@@ -72,8 +72,3 @@ export type PerguntasExcel = {
     "40. Você fez algum curso técnico?": string;
     "41. Qual o meio de transporte você usa para vir à escola?": string;
 };
-
-export type TypeResposta = {
-    resposta: string;
-    quantidade: number;
-};
