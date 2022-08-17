@@ -1,16 +1,17 @@
-import relatorioServer from "../server/RelatorioServer";
 import { Request, Response } from "express";
-import { PerguntaInterface } from "../model/Pergunta";
+import PerguntasDto from "../dto/PerguntasDto";
+import relatorioServer from "../server/RelatorioServer";
 
 class RelatorioController {
     async importarPlanilha(
         req: Request,
         res: Response
-    ): Promise<Response<Array<PerguntaInterface>>> {
-        console.log(req.file);
+    ): Promise<Response<Array<PerguntasDto>>> {
         const file: Express.Multer.File = <Express.Multer.File>req.file;
+        const response: Array<PerguntasDto> | null =
+            await relatorioServer.importarPlanilha(file);
 
-        return res.json(relatorioServer.importarPlanilha(file));
+        return res.json(response);
     }
 }
 

@@ -1,4 +1,4 @@
-const respostasUtils: Object = {
+const respostasUtils: any = {
     "1. Qual o seu curso?": [
         "Análise e Desenvolvimento de Sistemas (ADS)",
         "Gestão da Produção Industrial (GPI)",
