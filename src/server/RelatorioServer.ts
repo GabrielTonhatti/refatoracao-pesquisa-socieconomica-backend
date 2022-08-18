@@ -8,22 +8,26 @@ import respostasUtils from "../utils/respostasUtils";
 import { PerguntasExcel } from "../utils/types/types";
 import planilhaServer from "./PlanilhaServer";
 import RespostaDto from "../dto/RespostaDto";
+import respostasDto from "../dto/RespostasDto";
 
 type PerguntaRepository = Model<PerguntaInterface, {}, {}, {}, any>;
+
 interface PerguntaSchema extends PerguntaInterface {
     _id: Types.ObjectId;
 }
 
 class RelatorioServer {
-    private readonly repository: PerguntaRepository;
-    private static readonly TEXTO_DESNECCESSARIO: string =
+    private static readonly TEXTO_DESNECESSARIO: string =
         "Estamos quase acabando... ";
+
     private static readonly ITENS_PARA_REMOVER: Array<string> = [
         "3. Informe os 7 últimos dígitos do seu RA (109048xxxxxxx)",
         "__rowNum__",
         "Timestamp",
         "Email Address",
     ];
+
+    private readonly repository: PerguntaRepository;
 
     public constructor() {
         this.repository = model<PerguntaInterface>("Pergunta", Pergunta.schema);
@@ -58,7 +62,7 @@ class RelatorioServer {
         perguntas: Array<string>,
         dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): Promise<Array<PerguntasDto> | null> {
-        const perguntasModel: Array<PerguntaInterface> = new Array();
+        const perguntasModel: Array<PerguntaInterface> = [];
 
         perguntas.forEach((pergunta: string): void => {
             const perguntaModel: PerguntaInterface = new Pergunta({
@@ -83,13 +87,10 @@ class RelatorioServer {
         perguntasMongo: Array<PerguntaInterface>,
         dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): Promise<Array<PerguntasDto> | null> {
-        const response: Array<PerguntasDto> = new Array();
+        const response: Array<PerguntasDto> = [];
 
         try {
             for (const pergunta of perguntas) {
-                const respostas: Array<string> = new Array();
-                const dados: Array<number> = new Array();
-
                 const perguntaFormatada: string =
                     this.formatarPergunta(pergunta);
 
@@ -98,50 +99,24 @@ class RelatorioServer {
                         pergunta: perguntaFormatada,
                     });
 
-                dadosPlanilhaConvertida.forEach(
-                    (dados: PerguntasExcel): void => {
-                        const respostaPlanilha: string =
-                            dados[pergunta as keyof PerguntasExcel];
-
-                        if (respostaPlanilha !== undefined) {
-                            const respostaString: string =
-                                respostaPlanilha.toString();
-                            respostas.push(respostaString);
-
-                            respostaString
-                                .split(" ,")
-                                .forEach((resp: string): number =>
-                                    respostas.push(resp)
-                                );
-
-                            perguntaSchema?.respostas.forEach(
-                                (respostaSchema: string): void => {
-                                    const respostaDto: RespostaDto =
-                                        new RespostaDto();
-                                    const respostasDto: RespostasDto =
-                                        new RespostasDto();
-                                    if (
-                                        respostaString.includes(respostaSchema)
-                                    ) {
-                                        respostasDto.respostas.add(
-                                            respostaSchema
-                                        );
-                                        const perguntaDto: PerguntasDto =
-                                            PerguntasDto.of(
-                                                perguntaSchema.pergunta,
-                                                respostasDto
-                                            );
-                                        // console.log("perguntaDto", perguntaDto);
-                                        response.push(perguntaDto);
-                                    }
-                                    // console.log("teste");
-                                }
-                            );
-                        }
-                    }
+                const respostasDto: RespostasDto = new RespostasDto();
+                respostasDto.setLabels(
+                    <Array<string>>perguntaSchema?.respostas
+                );
+                this.processamentoDeRespostas(
+                    dadosPlanilhaConvertida,
+                    pergunta,
+                    respostasDto,
+                    perguntaSchema
                 );
 
-                // response.push(perguntaSchema);
+                const schema: PerguntaSchema = <PerguntaSchema>perguntaSchema;
+                const perguntaDto: PerguntasDto = PerguntasDto.of(
+                    schema.pergunta,
+                    respostasDto
+                );
+
+                response.push(perguntaDto);
             }
 
             return response;
@@ -149,8 +124,35 @@ class RelatorioServer {
             logger.error(error);
             logger.error(`Não foi possível encontrar a pergunta`);
 
-            return new Array<PerguntasDto>();
+            return [];
         }
+    }
+
+    private processamentoDeRespostas(
+        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+        pergunta: string,
+        respostasDto: RespostasDto,
+        perguntaSchema: PerguntaSchema | null
+    ): void {
+        dadosPlanilhaConvertida.forEach((dados: PerguntasExcel): void => {
+            const respostaPlanilha: string =
+                dados[pergunta as keyof PerguntasExcel];
+
+            if (respostaPlanilha !== undefined) {
+                const resposta: string = respostaPlanilha.toString();
+
+                perguntaSchema?.respostas.forEach(
+                    (respostaSchema: string): void => {
+                        if (resposta === respostaSchema) {
+                            const index: number = respostasDto
+                                .getLabels()
+                                .indexOf(respostaSchema);
+                            respostasDto.incrementarData(index);
+                        }
+                    }
+                );
+            }
+        });
     }
 
     private obterPerguntas(
@@ -162,15 +164,9 @@ class RelatorioServer {
         );
     }
 
-    private obterPerguntasFormatas(perguntas: Array<string>): Array<string> {
-        return perguntas
-            .map(this.formatarPergunta)
-            .filter((pergunta: string): boolean => pergunta !== undefined);
-    }
-
     private formatarPergunta(pergunta: string): string {
         return pergunta
-            .replace(RelatorioServer.TEXTO_DESNECCESSARIO, "")
+            .replace(RelatorioServer.TEXTO_DESNECESSARIO, "")
             .split(". ")[INDEX_PERGUNTA];
     }
 

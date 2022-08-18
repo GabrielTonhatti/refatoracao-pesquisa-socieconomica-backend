@@ -2,8 +2,8 @@ const respostasUtils: any = {
     "1. Qual o seu curso?": [
         "Análise e Desenvolvimento de Sistemas (ADS)",
         "Gestão da Produção Industrial (GPI)",
-        "Gestão de Recursos Humanos",
-        "Desenvolvimento de Software Multiplataforma",
+        "Gestão de Recursos Humanos (GRH)",
+        "Desenvolvimento de Software Multiplataforma (DSM)",
     ],
     "2. Qual o período que cursa?": ["Matutino", "Noturno"],
     "4. Qual o estado do Brasil que você nasceu?": [

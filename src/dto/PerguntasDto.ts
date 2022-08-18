@@ -1,37 +1,36 @@
 import RespostasDto from "./RespostasDto";
 
 class PerguntasDto {
-    private _pergunta: string;
-    private _respostas: RespostasDto;
+    private pergunta: string;
+    private respostas: RespostasDto;
 
     public constructor() {
-        this._pergunta = "";
-        this._respostas = new RespostasDto();
+        this.pergunta = "";
+        this.respostas = new RespostasDto();
     }
 
     public static of(pergunta: string, respostas: RespostasDto): PerguntasDto {
         const perguntasDto: PerguntasDto = new PerguntasDto();
-
-        perguntasDto.pergunta = pergunta;
-        perguntasDto.respostas = respostas;
+        perguntasDto.setPergunta(pergunta);
+        perguntasDto.setRespostas(respostas);
 
         return perguntasDto;
     }
 
-    public get pergunta(): string {
-        return this._pergunta;
+    public getPergunta(): string {
+        return this.pergunta;
     }
 
-    public set pergunta(value: string) {
-        this._pergunta = value;
+    public setPergunta(pergunta: string): void {
+        this.pergunta = pergunta;
     }
 
-    public get respostas(): RespostasDto {
-        return this._respostas;
+    public getRespostas(): RespostasDto {
+        return this.respostas;
     }
 
-    public set respostas(value: RespostasDto) {
-        this._respostas = value;
+    public setRespostas(resposta: RespostasDto): void {
+        this.respostas = resposta;
     }
 }
 

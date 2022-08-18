@@ -1,26 +1,26 @@
 class RespostaDto {
-    private _resposta: string;
-    private _data: number;
+    private resposta: string;
+    private data: number;
 
     public constructor() {
-        this._resposta = "";
-        this._data = 0;
+        this.resposta = "";
+        this.data = 0;
     }
 
-    public get resposta(): string {
-        return this._resposta;
+    public getResposta(): string {
+        return this.resposta;
     }
 
-    public set resposta(value: string) {
-        this._resposta = value;
+    public setResposta(resposta: string): void {
+        this.resposta = resposta;
     }
 
-    public get data(): number {
-        return this._data;
+    public getData(): number {
+        return this.data;
     }
 
-    public set data(value: number) {
-        this._data = value;
+    public setData(data: number): void {
+        this.data = data;
     }
 }
 

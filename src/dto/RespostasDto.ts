@@ -1,44 +1,49 @@
 class RespostasDto {
-    private _respostas: Set<string>;
-    private _dados: Array<number>;
+    private labels: Array<string>;
+    private data: Array<number>;
 
     public constructor() {
-        this._respostas = new Set<string>();
-        this._dados = new Array<number>();
+        this.labels = [];
+        this.data = [];
     }
 
-    public get respostas(): Set<string> {
-        return this._respostas;
+    public getLabels(): Array<string> {
+        return this.labels;
     }
 
-    public set respostas(value: Set<string>) {
-        this._respostas = value;
+    public setLabels(labels: Array<string>): void {
+        this.labels = labels;
     }
 
-    public get dados(): Array<number> {
-        return this._dados;
+    public getData(): Array<number> {
+        return this.data;
     }
 
-    public set dados(value: Array<number>) {
-        this._dados = value;
+    public setData(data: Array<number>): void {
+        this.data = data;
     }
 
-    public static of(
-        respostas: Set<string>,
-        dados: Array<number>
-    ): RespostasDto {
+    public incrementarData(index: number): void {
+        if (this.data[index] === undefined) {
+            this.data[index] = 1;
+        } else {
+            this.data[index]++;
+        }
+    }
+
+    public static of(labels: Array<string>, data: Array<number>): RespostasDto {
         const respostasDto: RespostasDto = new RespostasDto();
 
-        respostasDto.respostas = respostas;
-        respostasDto.dados = dados;
+        respostasDto.setLabels(labels);
+        respostasDto.setData(data);
 
         return respostasDto;
     }
 
-    public static ofData(resposta: string, dados: number): RespostasDto {
+    public static ofData(resposta: string, data: number): RespostasDto {
         const respostasDto: RespostasDto = new RespostasDto();
-        respostasDto.respostas.add(resposta);
-        respostasDto.dados.push(dados);
+        respostasDto.getLabels().push(resposta);
+        respostasDto.getData().push(data);
 
         return respostasDto;
     }
