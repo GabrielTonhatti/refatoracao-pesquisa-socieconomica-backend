@@ -5,7 +5,7 @@ import relatorioServer from "../server/RelatorioServer";
 class RelatorioController {
     async importarPlanilha(
         req: Request,
-        res: Response
+        res: Response,
     ): Promise<Response<Array<PerguntasDto>>> {
         const file: Express.Multer.File = <Express.Multer.File>req.file;
         const response: Array<PerguntasDto> | null =

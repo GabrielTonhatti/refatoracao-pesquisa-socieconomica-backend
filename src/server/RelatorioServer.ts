@@ -1,14 +1,13 @@
 import { Model, model, Types } from "mongoose";
 import logger from "../config/logger";
 import PerguntasDto from "../dto/PerguntasDto";
+import RespostaDto from "../dto/RespostaDto";
 import RespostasDto from "../dto/RespostasDto";
 import Pergunta, { PerguntaInterface } from "../model/Pergunta";
 import { INDEX_PERGUNTA } from "../utils/constantes";
 import respostasUtils from "../utils/respostasUtils";
 import { PerguntasExcel } from "../utils/types/types";
 import planilhaServer from "./PlanilhaServer";
-import RespostaDto from "../dto/RespostaDto";
-import respostasDto from "../dto/RespostasDto";
 
 type PerguntaRepository = Model<PerguntaInterface, {}, {}, {}, any>;
 
@@ -51,11 +50,7 @@ class RelatorioServer {
             );
         }
 
-        return await this.calcularRespostas(
-            perguntas,
-            perguntasMongo,
-            dadosPlanilhaConvertida
-        );
+        return await this.calcularRespostas(perguntas, dadosPlanilhaConvertida);
     }
 
     private async salvarPerguntas(
@@ -75,16 +70,11 @@ class RelatorioServer {
 
         await this.repository.create(perguntasModel);
 
-        return await this.calcularRespostas(
-            perguntas,
-            perguntasModel,
-            dadosPlanilhaConvertida
-        );
+        return await this.calcularRespostas(perguntas, dadosPlanilhaConvertida);
     }
 
     private async calcularRespostas(
         perguntas: Array<string>,
-        perguntasMongo: Array<PerguntaInterface>,
         dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): Promise<Array<PerguntasDto> | null> {
         const response: Array<PerguntasDto> = [];
@@ -93,15 +83,15 @@ class RelatorioServer {
             for (const pergunta of perguntas) {
                 const perguntaFormatada: string =
                     this.formatarPergunta(pergunta);
-
                 const perguntaSchema: PerguntaSchema | null =
                     await this.repository.findOne({
                         pergunta: perguntaFormatada,
                     });
 
                 const respostasDto: RespostasDto = new RespostasDto();
-                respostasDto.setLabels(
-                    <Array<string>>perguntaSchema?.respostas
+                this.preencherValoresIniciaisDeRespostas(
+                    respostasDto,
+                    <PerguntaSchema>perguntaSchema
                 );
                 this.processamentoDeRespostas(
                     dadosPlanilhaConvertida,
@@ -109,6 +99,7 @@ class RelatorioServer {
                     respostasDto,
                     perguntaSchema
                 );
+                this.removerLabelsSemResposta(respostasDto);
 
                 const schema: PerguntaSchema = <PerguntaSchema>perguntaSchema;
                 const perguntaDto: PerguntasDto = PerguntasDto.of(
@@ -128,6 +119,20 @@ class RelatorioServer {
         }
     }
 
+    private preencherValoresIniciaisDeRespostas(
+        respostasDto: RespostasDto,
+        perguntaSchema: PerguntaSchema
+    ) {
+        respostasDto.setLabels(<Array<string>>perguntaSchema?.respostas);
+
+        const respostas: Array<RespostaDto> = [];
+        respostasDto.getLabels().forEach((label: string): void => {
+            respostasDto.getData().push(0);
+            respostas.push(RespostaDto.of(label));
+        });
+        respostasDto.setRespostas(respostas);
+    }
+
     private processamentoDeRespostas(
         dadosPlanilhaConvertida: Array<PerguntasExcel>,
         pergunta: string,
@@ -144,15 +149,37 @@ class RelatorioServer {
                 perguntaSchema?.respostas.forEach(
                     (respostaSchema: string): void => {
                         if (resposta === respostaSchema) {
-                            const index: number = respostasDto
-                                .getLabels()
-                                .indexOf(respostaSchema);
+                            const index: number = this.obterIndexPergunta(
+                                respostasDto,
+                                respostaSchema
+                            );
                             respostasDto.incrementarData(index);
                         }
                     }
                 );
             }
         });
+    }
+
+    private obterIndexPergunta(respostasDto: RespostasDto, label: string) {
+        return respostasDto.getLabels().indexOf(label);
+    }
+
+    private removerLabelsSemResposta(respostasDto: RespostasDto): void {
+        const respostasFiltradas: Array<RespostaDto> = respostasDto
+            .getRespostas()
+            .filter((resposta: RespostaDto): boolean => resposta.getData() > 0);
+
+        respostasDto.setLabels(
+            respostasFiltradas.map((resposta: RespostaDto): string =>
+                resposta.getResposta()
+            )
+        );
+        respostasDto.setData(
+            respostasFiltradas.map((resposta: RespostaDto): number =>
+                resposta.getData()
+            )
+        );
     }
 
     private obterPerguntas(

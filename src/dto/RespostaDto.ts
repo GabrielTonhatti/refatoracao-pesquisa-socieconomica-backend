@@ -22,6 +22,13 @@ class RespostaDto {
     public setData(data: number): void {
         this.data = data;
     }
+
+    public static of(resposta: string): RespostaDto {
+        const respostaDto: RespostaDto = new RespostaDto();
+        respostaDto.setResposta(resposta);
+
+        return respostaDto;
+    }
 }
 
 export default RespostaDto;

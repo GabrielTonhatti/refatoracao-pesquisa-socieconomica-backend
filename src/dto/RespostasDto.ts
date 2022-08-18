@@ -1,10 +1,14 @@
+import RespostaDto from "./RespostaDto";
+
 class RespostasDto {
     private labels: Array<string>;
     private data: Array<number>;
+    private respostas: Array<RespostaDto>;
 
     public constructor() {
         this.labels = [];
         this.data = [];
+        this.respostas = [];
     }
 
     public getLabels(): Array<string> {
@@ -23,29 +27,24 @@ class RespostasDto {
         this.data = data;
     }
 
+    public getRespostas(): Array<RespostaDto> {
+        return this.respostas;
+    }
+
+    public setRespostas(resposta: Array<RespostaDto>): void {
+        this.respostas = resposta;
+    }
+
     public incrementarData(index: number): void {
-        if (this.data[index] === undefined) {
-            this.data[index] = 1;
+        if (this.respostas[index] === undefined) {
+            const resposta: RespostaDto = new RespostaDto();
+            resposta.setResposta(this.getLabels()[index]);
+            resposta.setData(1);
+
+            this.respostas.push(resposta);
         } else {
-            this.data[index]++;
+            this.respostas[index].setData(this.respostas[index].getData() + 1);
         }
-    }
-
-    public static of(labels: Array<string>, data: Array<number>): RespostasDto {
-        const respostasDto: RespostasDto = new RespostasDto();
-
-        respostasDto.setLabels(labels);
-        respostasDto.setData(data);
-
-        return respostasDto;
-    }
-
-    public static ofData(resposta: string, data: number): RespostasDto {
-        const respostasDto: RespostasDto = new RespostasDto();
-        respostasDto.getLabels().push(resposta);
-        respostasDto.getData().push(data);
-
-        return respostasDto;
     }
 }
 
