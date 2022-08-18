@@ -11,6 +11,7 @@ import { PerguntasExcel } from "../utils/types/types";
 import planilhaServer from "./PlanilhaServer";
 import RelatorioResponse from "../dto/RelatorioResponse";
 import { Turno } from "../enums/Turno";
+import { Logger } from "pino";
 
 type PerguntaRepository = Model<PerguntaInterface, {}, {}, {}, any>;
 
@@ -32,10 +33,14 @@ class RelatorioServer {
         "Email Address",
     ];
 
+    private static readonly SEPARADOR_PERGUNTA: string = ", ";
+
     private readonly repository: PerguntaRepository;
+    private readonly log: Logger;
 
     public constructor() {
         this.repository = model<PerguntaInterface>("Pergunta", Pergunta.schema);
+        this.log = logger;
     }
 
     public async importarPlanilha(
@@ -63,20 +68,31 @@ class RelatorioServer {
         perguntas: Array<string>,
         dadosPlanilhaConvertida: Array<PerguntasExcel>,
     ): Promise<Array<RelatorioResponse> | null> {
-        const perguntasModel: Array<PerguntaInterface> = [];
+        try {
+            const perguntasModel: Array<PerguntaInterface> = [];
 
-        perguntas.forEach((pergunta: string): void => {
-            const perguntaModel: PerguntaInterface = new Pergunta({
-                pergunta: this.formatarPergunta(pergunta),
-                respostas: respostasUtils[pergunta],
+            perguntas.forEach((pergunta: string): void => {
+                const perguntaModel: PerguntaInterface = new Pergunta({
+                    pergunta: this.formatarPergunta(pergunta),
+                    respostas: respostasUtils[pergunta],
+                });
+
+                perguntasModel.push(perguntaModel);
             });
 
-            perguntasModel.push(perguntaModel);
-        });
+            await this.repository.create(perguntasModel);
+            this.log.info(`Perguntas salvas com sucesso`);
 
-        await this.repository.create(perguntasModel);
+            return await this.calcularRespostas(
+                perguntas,
+                dadosPlanilhaConvertida,
+            );
+        } catch (error: any) {
+            this.log.error(error);
+            this.log.error(`Ocorreu um erro ao salvar as perguntas`);
 
-        return await this.calcularRespostas(perguntas, dadosPlanilhaConvertida);
+            return [];
+        }
     }
 
     private async calcularRespostas(
@@ -119,8 +135,8 @@ class RelatorioServer {
 
             return response.map(RelatorioResponse.of);
         } catch (error: any) {
-            logger.error(error);
-            logger.error(`Não foi possível encontrar a pergunta`);
+            this.log.error(error);
+            this.log.error(`Não foi possível encontrar a pergunta`);
 
             return [];
         }
@@ -219,22 +235,26 @@ class RelatorioServer {
         respostasNoturno: RespostasDto,
     ): void {
         respostasMongo.forEach((respostaSchema: string): void => {
-            if (resposta === respostaSchema) {
-                const index: number = this.obterIndexPergunta(
-                    respostasGeral,
-                    respostaSchema,
-                );
-                respostasGeral.incrementarData(index);
+            resposta
+                .split(RelatorioServer.SEPARADOR_PERGUNTA)
+                .forEach((resp: string): void => {
+                    if (resp === respostaSchema) {
+                        const index: number = this.obterIndexPergunta(
+                            respostasGeral,
+                            respostaSchema,
+                        );
+                        respostasGeral.incrementarData(index);
 
-                switch (turno) {
-                    case Turno.MATUTINO:
-                        respostasMatutino.incrementarData(index);
-                        break;
-                    case Turno.NOTURNO:
-                        respostasNoturno.incrementarData(index);
-                        break;
-                }
-            }
+                        switch (turno) {
+                            case Turno.MATUTINO:
+                                respostasMatutino.incrementarData(index);
+                                break;
+                            case Turno.NOTURNO:
+                                respostasNoturno.incrementarData(index);
+                                break;
+                        }
+                    }
+                });
         });
     }
 

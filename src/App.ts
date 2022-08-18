@@ -4,12 +4,15 @@ import cors from "cors";
 import routes from "./routes";
 import mongoose from "mongoose";
 import logger from "./config/logger";
+import { Logger } from "pino";
 
 class App {
     private readonly _app: Application;
+    private readonly log: Logger;
 
     public constructor() {
         this._app = express();
+        this.log = logger;
         this.database();
         this.middlewares();
         this.routes();
@@ -22,14 +25,14 @@ class App {
     }
 
     private database(): void {
-        logger.info("Connecting to database...");
+        this.log.info("Connecting to database...");
         mongoose
             .connect(<string>process.env.MONGO_URL)
-            .then((): void => logger.info("MongoDB connected ✅"))
+            .then((): void => this.log.info("MongoDB connected ✅"))
             .catch((error: Error): void => {
-                logger.error("Error connecting to MongoDB ❌");
-                logger.error(error);
-                logger.info("MongoDB disconnected");
+                this.log.error("Error connecting to MongoDB ❌");
+                this.log.error(error);
+                this.log.info("MongoDB disconnected");
             });
     }
 
