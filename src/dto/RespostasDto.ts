@@ -1,50 +1,74 @@
 import RespostaDto from "./RespostaDto";
 
 class RespostasDto {
-    private labels: Array<string>;
-    private data: Array<number>;
-    private respostas: Array<RespostaDto>;
+    private _labels: Array<string>;
+    private _data: Array<number>;
+    private _respostas: Array<RespostaDto>;
 
     public constructor() {
-        this.labels = [];
-        this.data = [];
-        this.respostas = [];
+        this._labels = [];
+        this._data = [];
+        this._respostas = [];
     }
 
-    public getLabels(): Array<string> {
-        return this.labels;
+    public get labels(): Array<string> {
+        return this._labels;
     }
 
-    public setLabels(labels: Array<string>): void {
-        this.labels = labels;
+    public set labels(labels: Array<string>) {
+        this._labels = labels;
     }
 
-    public getData(): Array<number> {
-        return this.data;
+    public get data(): Array<number> {
+        return this._data;
     }
 
-    public setData(data: Array<number>): void {
-        this.data = data;
+    public set data(data: Array<number>) {
+        this._data = data;
     }
 
-    public getRespostas(): Array<RespostaDto> {
-        return this.respostas;
+    public get respostas(): Array<RespostaDto> {
+        return this._respostas;
     }
 
-    public setRespostas(resposta: Array<RespostaDto>): void {
-        this.respostas = resposta;
+    public set respostas(resposta: Array<RespostaDto>) {
+        this._respostas = resposta;
     }
 
     public incrementarData(index: number): void {
-        if (this.respostas[index] === undefined) {
+        if (this._respostas[index] === undefined) {
             const resposta: RespostaDto = new RespostaDto();
-            resposta.setResposta(this.getLabels()[index]);
-            resposta.setData(1);
+            resposta.resposta = this.labels[index];
+            resposta.data = 1;
 
-            this.respostas.push(resposta);
+            this._respostas.push(resposta);
         } else {
-            this.respostas[index].setData(this.respostas[index].getData() + 1);
+            this._respostas[index].data++;
         }
+    }
+
+    public preencherValoresIniciaisDeRespostas(labels: Array<string>): void {
+        const respostas: Array<RespostaDto> = [];
+
+        this.labels = labels;
+        this.labels.forEach((label: string): void => {
+            this.data.push(0);
+            respostas.push(RespostaDto.of(label));
+        });
+
+        this.respostas = respostas;
+    }
+
+    public removerLabelsSemResposta(): void {
+        const respostasFiltradas: Array<RespostaDto> = this.respostas.filter(
+            (resposta: RespostaDto): boolean => resposta.data > 0,
+        );
+        this.labels = respostasFiltradas.map(
+            (resposta: RespostaDto): string => resposta.resposta,
+        );
+        this.data = respostasFiltradas.map(
+            (resposta: RespostaDto): number => resposta.data,
+        );
     }
 }
 

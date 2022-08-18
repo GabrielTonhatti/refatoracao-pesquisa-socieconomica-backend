@@ -1,31 +1,39 @@
 class RespostaDto {
-    private resposta: string;
-    private data: number;
+    private _resposta: string;
+    private _data: number;
 
     public constructor() {
-        this.resposta = "";
-        this.data = 0;
+        this._resposta = "";
+        this._data = 0;
     }
 
-    public getResposta(): string {
-        return this.resposta;
+    public get resposta(): string {
+        return this._resposta;
     }
 
-    public setResposta(resposta: string): void {
-        this.resposta = resposta;
+    public set resposta(resposta: string) {
+        this._resposta = resposta;
     }
 
-    public getData(): number {
-        return this.data;
+    public get data(): number {
+        return this._data;
     }
 
-    public setData(data: number): void {
-        this.data = data;
+    public set data(data: number) {
+        this._data = data;
     }
 
     public static of(resposta: string): RespostaDto {
         const respostaDto: RespostaDto = new RespostaDto();
-        respostaDto.setResposta(resposta);
+        respostaDto.resposta = resposta;
+
+        return respostaDto;
+    }
+
+    public static ofWithData(resposta: string, data: number): RespostaDto {
+        const respostaDto: RespostaDto = new RespostaDto();
+        respostaDto.resposta = resposta;
+        respostaDto.data = data;
 
         return respostaDto;
     }
