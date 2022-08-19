@@ -7,7 +7,7 @@ export interface PerguntaInterface extends Document {
 
 const PerguntaSchema = new Schema({
     pergunta: String,
-    respostas: Array<string>,
+    respostas: Array<string>
 });
 
 export default model<PerguntaInterface>("Pergunta", PerguntaSchema);

@@ -48,7 +48,7 @@ class RespostasDto {
     }
 
     public preencherValoresIniciaisDeRespostas(
-        labels: Array<string>,
+        labels: Array<string>
     ): void {
         const respostas: Array<RespostaDto> = [];
 
@@ -63,13 +63,13 @@ class RespostasDto {
 
     public removerLabelsSemResposta(): void {
         const respostasFiltradas: Array<RespostaDto> = this.respostas.filter(
-            (resposta: RespostaDto): boolean => resposta.data > 0,
+            (resposta: RespostaDto): boolean => resposta.data > 0
         );
         this.labels = respostasFiltradas.map(
-            (resposta: RespostaDto): string => resposta.resposta,
+            (resposta: RespostaDto): string => resposta.resposta
         );
         this.data = respostasFiltradas.map(
-            (resposta: RespostaDto): number => resposta.data,
+            (resposta: RespostaDto): number => resposta.data
         );
     }
 }

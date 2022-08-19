@@ -9,7 +9,7 @@ class RespostasResponse {
         "Análise e Desenvolvimento de Sistemas (ADS)",
         "Gestão da Produção Industrial (GPI)",
         "Gestão de Recursos Humanos (GRH)",
-        "Desenvolvimento de Software Multiplataforma (DSM)",
+        "Desenvolvimento de Software Multiplataforma (DSM)"
     ];
 
     private labels: Array<string>;
@@ -51,9 +51,9 @@ class RespostasResponse {
                     .split(RespostasResponse.PARENTESES_ABERTURA)
                     [RespostasResponse.INDEX_SIGLA].replace(
                         RespostasResponse.PARENTESES_FECHAMENTO,
-                        "",
+                        ""
                     )
-                : label,
+                : label
         );
     }
 }

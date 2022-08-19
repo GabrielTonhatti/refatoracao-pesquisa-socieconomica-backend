@@ -33,7 +33,7 @@ export class Utils {
             if (novoArray[posSelecionada] > novoArray[posicaoMenor]) {
                 [novoArray[posSelecionada], novoArray[posicaoMenor]] = [
                     novoArray[posicaoMenor],
-                    novoArray[posSelecionada],
+                    novoArray[posSelecionada]
                 ];
             }
         }

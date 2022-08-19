@@ -21,6 +21,7 @@ interface PerguntaSchema extends PerguntaInterface {
 }
 
 class RelatorioServer {
+    private static readonly EXTENSAO_PERMITIDA: string = ".xlsx";
     private static readonly TEXTO_DESNECESSARIO: string =
         "Estamos quase acabando... ";
 
@@ -31,7 +32,11 @@ class RelatorioServer {
         "3. Informe os 7 últimos dígitos do seu RA (109048xxxxxxx)",
         "__rowNum__",
         "Timestamp",
-        "Email Address",
+        "Email Address"
+    ];
+
+    private static readonly TIPO_ARQUIVOS_PERMITIDOS: Array<string> = [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ];
 
     private static readonly PRIMEIRA_PERGUNTA: string = "1. Qual o seu curso?";
@@ -47,8 +52,10 @@ class RelatorioServer {
     }
 
     public async importarPlanilha(
-        file: Express.Multer.File,
+        file: Express.Multer.File
     ): Promise<Array<RelatorioResponse> | null> {
+        this.validarArquivo(file);
+
         const dadosPlanilhaConvertida: Array<PerguntasExcel> = <
             Array<PerguntasExcel>
         >planilhaServer.converterPlanilha(file);
@@ -56,7 +63,7 @@ class RelatorioServer {
         this.validarPlanilha(dadosPlanilhaConvertida);
 
         const perguntas: Array<string> = this.obterPerguntas(
-            dadosPlanilhaConvertida,
+            dadosPlanilhaConvertida
         );
         const perguntasMongo: Array<PerguntaInterface> =
             await this.repository.find();
@@ -64,7 +71,7 @@ class RelatorioServer {
         if (this.isEmpty(perguntasMongo)) {
             return await this.salvarPerguntas(
                 perguntas,
-                dadosPlanilhaConvertida,
+                dadosPlanilhaConvertida
             );
         }
 
@@ -73,7 +80,7 @@ class RelatorioServer {
 
     private async salvarPerguntas(
         perguntas: Array<string>,
-        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+        dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): Promise<Array<RelatorioResponse> | null> {
         try {
             this.log.info(`Salvando perguntas no banco de dados`);
@@ -82,7 +89,7 @@ class RelatorioServer {
             perguntas.forEach((pergunta: string): void => {
                 const perguntaModel: PerguntaInterface = new Pergunta({
                     pergunta: this.formatarPergunta(pergunta),
-                    respostas: respostasUtils[pergunta],
+                    respostas: respostasUtils[pergunta]
                 });
 
                 perguntasModel.push(perguntaModel);
@@ -93,7 +100,7 @@ class RelatorioServer {
 
             return await this.calcularRespostas(
                 perguntas,
-                dadosPlanilhaConvertida,
+                dadosPlanilhaConvertida
             );
         } catch (error: any) {
             this.log.error(error);
@@ -105,7 +112,7 @@ class RelatorioServer {
 
     private async calcularRespostas(
         perguntas: Array<string>,
-        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+        dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): Promise<Array<RelatorioResponse> | null> {
         const response: Array<PerguntasDto> = [];
 
@@ -115,7 +122,7 @@ class RelatorioServer {
                     this.formatarPergunta(pergunta);
                 const perguntaSchema: PerguntaSchema | null =
                     await this.repository.findOne({
-                        pergunta: perguntaFormatada,
+                        pergunta: perguntaFormatada
                     });
 
                 const respostasGeral: RespostasDto = new RespostasDto();
@@ -127,7 +134,7 @@ class RelatorioServer {
                     respostasMatutino,
                     respostasNoturno,
                     dadosPlanilhaConvertida,
-                    pergunta,
+                    pergunta
                 );
 
                 const schema: PerguntaSchema = <PerguntaSchema>perguntaSchema;
@@ -135,7 +142,7 @@ class RelatorioServer {
                     schema.pergunta,
                     respostasGeral,
                     respostasMatutino,
-                    respostasNoturno,
+                    respostasNoturno
                 );
 
                 response.push(perguntaDto);
@@ -156,7 +163,7 @@ class RelatorioServer {
         respostasMatutino: RespostasDto,
         respostasNoturno: RespostasDto,
         dadosPlanilhaConvertida: PerguntasExcel[],
-        pergunta: string,
+        pergunta: string
     ): void {
         const respostasMongo: Array<string> = <Array<string>>(
             perguntaSchema?.respostas
@@ -169,28 +176,27 @@ class RelatorioServer {
             this.obterRespostasPlanilha(
                 dadosPlanilhaConvertida,
                 respostasSet,
-                pergunta,
+                pergunta
             );
-            // FIXME: Concerta método de ordenação do array
             respostasPossiveis = utils.ordenarArray(Array.from(respostasSet));
 
             respostasGeral.preencherValoresIniciaisDeRespostas(
-                respostasPossiveis,
+                respostasPossiveis
             );
             respostasMatutino.preencherValoresIniciaisDeRespostas(
-                respostasPossiveis,
+                respostasPossiveis
             );
             respostasNoturno.preencherValoresIniciaisDeRespostas(
-                respostasPossiveis,
+                respostasPossiveis
             );
             hasNotRespostaMongo = true;
         } else {
             respostasGeral.preencherValoresIniciaisDeRespostas(respostasMongo);
             respostasMatutino.preencherValoresIniciaisDeRespostas(
-                respostasMongo,
+                respostasMongo
             );
             respostasNoturno.preencherValoresIniciaisDeRespostas(
-                respostasMongo,
+                respostasMongo
             );
 
             hasNotRespostaMongo = false;
@@ -204,7 +210,7 @@ class RelatorioServer {
             respostasNoturno,
             respostasMongo,
             respostasPossiveis,
-            hasNotRespostaMongo,
+            hasNotRespostaMongo
         );
 
         respostasGeral.removerLabelsSemResposta();
@@ -220,7 +226,7 @@ class RelatorioServer {
         respostasNoturno: RespostasDto,
         respostasMongo: Array<string>,
         respostasPossiveis: Array<string>,
-        hasNotRespostaMongo: boolean,
+        hasNotRespostaMongo: boolean
     ): void {
         dadosPlanilhaConvertida.forEach((dados: PerguntasExcel): void => {
             const turno: string =
@@ -240,7 +246,7 @@ class RelatorioServer {
                         turno,
                         respostasGeral,
                         respostasMatutino,
-                        respostasNoturno,
+                        respostasNoturno
                     );
                 } else {
                     this.validarRespostasMongo(
@@ -249,7 +255,7 @@ class RelatorioServer {
                         turno,
                         respostasGeral,
                         respostasMatutino,
-                        respostasNoturno,
+                        respostasNoturno
                     );
                 }
             }
@@ -262,37 +268,36 @@ class RelatorioServer {
         turno: string,
         respostasGeral: RespostasDto,
         respostasMatutino: RespostasDto,
-        respostasNoturno: RespostasDto,
+        respostasNoturno: RespostasDto
     ): void {
-        respostas
-            .forEach((respostaAtual: string): void => {
-                resposta
-                    .split(RelatorioServer.SEPARADOR_PERGUNTA)
-                    .forEach((resp: string): void => {
-                        if (resp === respostaAtual.toString()) {
-                            const index: number = this.obterIndexPergunta(
-                                respostasGeral,
-                                respostaAtual,
-                            );
-                            respostasGeral.incrementarData(index);
+        respostas.forEach((respostaAtual: string): void => {
+            resposta
+                .split(RelatorioServer.SEPARADOR_PERGUNTA)
+                .forEach((resp: string): void => {
+                    if (resp === respostaAtual.toString()) {
+                        const index: number = this.obterIndexPergunta(
+                            respostasGeral,
+                            respostaAtual
+                        );
+                        respostasGeral.incrementarData(index);
 
-                            switch (turno) {
-                                case Turno.MATUTINO:
-                                    respostasMatutino.incrementarData(index);
-                                    break;
-                                case Turno.NOTURNO:
-                                    respostasNoturno.incrementarData(index);
-                                    break;
-                            }
+                        switch (turno) {
+                            case Turno.MATUTINO:
+                                respostasMatutino.incrementarData(index);
+                                break;
+                            case Turno.NOTURNO:
+                                respostasNoturno.incrementarData(index);
+                                break;
                         }
-                    });
-            });
+                    }
+                });
+        });
     }
 
     private obterRespostasPlanilha(
         dadosPlanilhaConvertida: Array<PerguntasExcel>,
         respostas: Set<string>,
-        pergunta: string,
+        pergunta: string
     ): void {
         dadosPlanilhaConvertida.forEach((dados: PerguntasExcel): void => {
             const resposta: string = dados[pergunta as keyof PerguntasExcel];
@@ -312,11 +317,11 @@ class RelatorioServer {
     }
 
     private obterPerguntas(
-        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+        dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): Array<string> {
         return Object.getOwnPropertyNames(dadosPlanilhaConvertida[0]).filter(
             (pergunta: string): boolean =>
-                !RelatorioServer.ITENS_PARA_REMOVER.includes(pergunta),
+                !RelatorioServer.ITENS_PARA_REMOVER.includes(pergunta)
         );
     }
 
@@ -331,7 +336,7 @@ class RelatorioServer {
     }
 
     private validarPlanilha(
-        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+        dadosPlanilhaConvertida: Array<PerguntasExcel>
     ): void {
         if (this.isEmpty(dadosPlanilhaConvertida)) {
             throw new Error(Errors.ERRO_PLANILHA_VAZIA);
@@ -347,6 +352,12 @@ class RelatorioServer {
             primeiraPergunta === undefined
         ) {
             throw new Error(Errors.ERRO_PLANILHA_INVALIDA);
+        }
+    }
+
+    private validarArquivo(file: Express.Multer.File): void {
+        if (!RelatorioServer.TIPO_ARQUIVOS_PERMITIDOS.includes(file.mimetype)) {
+            throw new Error(Errors.ERRO_TIPO_ARQUIVO_INVALIDO);
         }
     }
 }

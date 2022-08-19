@@ -28,7 +28,7 @@ class PlanilhaService {
                 (quest: PerguntasExcel, index: number): string =>
                     (quest[
                         PlanilhaService.PERGUNTA_DATA_NASCIMENTO as keyof PerguntasExcel
-                    ] = this.getDataAnoNascimento(index + 1, worksheet)),
+                    ] = this.getDataAnoNascimento(index + 1, worksheet))
             );
 
             return quests;

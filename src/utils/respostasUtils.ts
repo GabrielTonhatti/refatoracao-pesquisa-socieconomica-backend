@@ -3,7 +3,7 @@ const respostasUtils: any = {
         "Análise e Desenvolvimento de Sistemas (ADS)",
         "Gestão da Produção Industrial (GPI)",
         "Gestão de Recursos Humanos (GRH)",
-        "Desenvolvimento de Software Multiplataforma (DSM)",
+        "Desenvolvimento de Software Multiplataforma (DSM)"
     ],
     "2. Qual o período que cursa?": ["Matutino", "Noturno"],
     "4. Qual o estado do Brasil que você nasceu?": [
@@ -33,7 +33,7 @@ const respostasUtils: any = {
         "Santa Catarina (SC)",
         "São Paulo (SP)",
         "Sergipe (SE)",
-        "Tocantins (TO)",
+        "Tocantins (TO)"
     ],
     "5. Qual sua cidade de residência?": [
         "Batatais",
@@ -72,7 +72,7 @@ const respostasUtils: any = {
         "Sales Oliveira",
         "S. Joaquim da Barra",
         "S. José da Bela Vista",
-        "São Tomaz de Aquino",
+        "São Tomaz de Aquino"
     ],
     "6. Qual o seu gênero?": [
         "Masculino",
@@ -82,14 +82,14 @@ const respostasUtils: any = {
         "Homem Transexual",
         "Mulher Transexual",
         "Não sei responder",
-        "Prefiro não responder",
+        "Prefiro não responder"
     ],
     "7. Qual a sua data de nascimento?": [],
     "8. Qual é o seu estado civil?": [
         "Solteiro(a)",
         "Casado(a) ou União Estável",
         "Separado(a), desquitado(a), divorciado(a)",
-        "Viúvo(a)",
+        "Viúvo(a)"
     ],
     "9. Você é portador de alguma necessidade especial?(Pode selecionar mais de uma, se for o caso)":
         ["Nenhuma", "Visual", "Física", "Auditiva", "Autismo", "De fala"],
@@ -101,7 +101,7 @@ const respostasUtils: any = {
         "Visual",
         "De fala",
         "Física",
-        "Não convivo ou não moro com alguém com deficiência",
+        "Não convivo ou não moro com alguém com deficiência"
     ],
     "11. Quantos filhos você tem?": [
         "Nenhum",
@@ -109,13 +109,13 @@ const respostasUtils: any = {
         "Dois",
         "Três",
         "Quatro",
-        "Mais de quatro",
+        "Mais de quatro"
     ],
     "12. Com quem você mora atualmente?": [
         "Com pais e(ou) parentes",
         "Com esposa(o) e(ou) filho(s)",
         "Com amigos (compartilhando despesas) ou de favor",
-        "Sozinho",
+        "Sozinho"
     ],
     "13. Quantas pessoas, incluindo você, moram no seu domicílio?": [],
     "14. Qual a situação do domicílio onde mora?": [
@@ -124,7 +124,7 @@ const respostasUtils: any = {
         "Cedido",
         "Financiado",
         "Arrendado",
-        "Mensalista",
+        "Mensalista"
     ],
     "15. Tempo de moradia neste domicílio (Em anos)": [],
     "16. Qual a faixa de renda mensal da sua família (em Salários Mínimos)": [
@@ -133,7 +133,7 @@ const respostasUtils: any = {
         "Mais de cinco até dez salários mínimos",
         "Mais de dez até vinte salários mínimos",
         "Mais de vinte salários mínimos",
-        "Prefiro não responder",
+        "Prefiro não responder"
     ],
     "17.1. Quantas geladeiras há em seu domicílio.": [],
     "17.2. Quantos celulares comuns há em seu domicílio?": [],
@@ -151,7 +151,7 @@ const respostasUtils: any = {
         "Internet",
         "Tv por assinatura",
         "Empregada mensalista",
-        "Nenhuma das opções acima",
+        "Nenhuma das opções acima"
     ],
     "19.1. Você trabalha?": ["Sim", "Não"],
     "19.2. Qual o seu vínculo com o emprego?": [
@@ -162,12 +162,12 @@ const respostasUtils: any = {
         "Sou registrado em empresa pública (federal/estadual/municipal)",
         "Sou autônomo",
         "Sou empresário",
-        "Sou estagiário",
+        "Sou estagiário"
     ],
     "19.3. Qual a área do seu trabalho?": [
         "Não trabalho",
         "Trabalho na área do curso",
-        "Trabalho fora da área do curso",
+        "Trabalho fora da área do curso"
     ],
     "19.4. Qual seu horário de trabalho?": [
         "Não trabalho",
@@ -177,7 +177,7 @@ const respostasUtils: any = {
         "Manhã e tarde",
         "Manhã e noite",
         "Tarde e noite",
-        "Regime de turnos",
+        "Regime de turnos"
     ],
     "19.5. Qual a empresa que você está contratado agora?": [],
     "20. Você tem plano de saúde privado?": [
@@ -185,7 +185,7 @@ const respostasUtils: any = {
         "Tenho e é pago integralmente pela empresa",
         "Tenho e é pago parcialmente pela empresa",
         "Tenho e é um plano familiar",
-        "Tenho e é um plano individual",
+        "Tenho e é um plano individual"
     ],
     "21.1. Qual o grau de escolaridade do seu pai?": [
         "Nenhuma escolaridade",
@@ -194,7 +194,7 @@ const respostasUtils: any = {
         "Ensino Médio",
         "Ensino Superior",
         "Pós-graduação",
-        "Prefiro não responder",
+        "Prefiro não responder"
     ],
     "21.2. Qual o grau de escolaridade da sua mãe?": [
         "Nenhuma escolaridade",
@@ -203,7 +203,7 @@ const respostasUtils: any = {
         "Ensino Médio",
         "Ensino Superior",
         "Pós-graduação",
-        "Prefiro não responder",
+        "Prefiro não responder"
     ],
     "22. Na sua vida escolar você estudou": [
         "Sempre em escola pública",
@@ -211,20 +211,20 @@ const respostasUtils: any = {
         "Sempre em escola particular paga pela família",
         "Sempre em escola particular com bolsa",
         "A maior parte em escola particular paga pela família",
-        "A maior parte em escola particular com bolsa",
+        "A maior parte em escola particular com bolsa"
     ],
     "23.1. Com que frequência você utiliza microcomputadores?": [
         "Nunca",
         "Pouco",
         "Ás vezes",
         "Muito",
-        "Sempre",
+        "Sempre"
     ],
     "23.2. Onde você utiliza microcomputadores?": [
         "Em casa",
         "Na escola",
         "No trabalho",
-        "Em outros lugares",
+        "Em outros lugares"
     ],
     "23.3. Com qual finalidade você utiliza microcomputadores?": [
         "Para trabalhos profissionais",
@@ -232,13 +232,13 @@ const respostasUtils: any = {
         "Para entretenimento (músicas, vídeos, redes sociais, etc)",
         "Para comunicação por e-mail",
         "Para operações bancárias",
-        "Para compras eletrônicas",
+        "Para compras eletrônicas"
     ],
     "24. Como você classifica seu conhecimento em informática": [
         "Nenhum",
         "Pouco",
         "Intermediário",
-        "Muito Avançado",
+        "Muito Avançado"
     ],
     "25. Qual o seu conhecimento em relação aos aplicativos a seguir? [Windows]":
         ["Nenhum", "Pouco", "Intermediário", "Muito Avançado"],
@@ -257,21 +257,21 @@ const respostasUtils: any = {
         "Leio, escrevo e falo razoavelmente",
         "Leio e escrevo mas não falo",
         "Leio mas não escrevo nem falo",
-        "Praticamente nula",
+        "Praticamente nula"
     ],
     "26. Agora, considere seu conhecimento sobre idiomas [Espanhol]": [
         "Leio, escrevo e falo bem",
         "Leio, escrevo e falo razoavelmente",
         "Leio e escrevo mas não falo",
         "Leio mas não escrevo nem falo",
-        "Praticamente nula",
+        "Praticamente nula"
     ],
     "26. Agora, considere seu conhecimento sobre idiomas [Outro Idioma]": [
         "Leio, escrevo e falo bem",
         "Leio, escrevo e falo razoavelmente",
         "Leio e escrevo mas não falo",
         "Leio mas não escrevo nem falo",
-        "Praticamente nula",
+        "Praticamente nula"
     ],
     "27. Considere a busca por informação nos seguintes meios de comunicação [Televisores]":
         ["Nunca", "Pouco", "Às vezes", "Muito", "Sempre"],
@@ -292,7 +292,7 @@ const respostasUtils: any = {
         "Algumas vezes por semana",
         "Somente aos domingos",
         "Raramente",
-        "Não leio",
+        "Não leio"
     ],
     "29. Se você lê jornal, quais os assuntos que mais lê?": [
         "Não leio jornal",
@@ -305,7 +305,7 @@ const respostasUtils: any = {
         "Notícias policiais",
         "Classificados",
         "Moda",
-        "Sociais",
+        "Sociais"
     ],
     "30. Não considerando os livros escolares, quantos livros você lê por ano (em média)?":
         ["Nenhum", "Até 2", "De 3 até 6", "De 7 até 10", "Mais de 10"],
@@ -318,11 +318,11 @@ const respostasUtils: any = {
             "Biográfico",
             "Aventura",
             "Autoajuda",
-            "Outros",
+            "Outros"
         ],
     "32. Você dedica parte do seu tempo para atividades voluntárias?": [
         "Sim",
-        "Não",
+        "Não"
     ],
     "33. Qual religião você professa?": [
         "Nenhuma",
@@ -330,7 +330,7 @@ const respostasUtils: any = {
         "Espírita",
         "Evangélica",
         "Protestante",
-        "Outra",
+        "Outra"
     ],
     "34. Quais fontes de entretenimento cultural você usa?": [
         "Cinema",
@@ -342,7 +342,7 @@ const respostasUtils: any = {
         "Teatro",
         "TV",
         "Viagens",
-        "Nenhuma",
+        "Nenhuma"
     ],
     "35. Estamos quase acabando... Como conheceu a FATEC Franca?": [
         "Cartaz de divulgação",
@@ -351,7 +351,7 @@ const respostasUtils: any = {
         "Por algum dos jornais",
         "Por alguma das rádios",
         "Por outdoor",
-        "Propaganda na escola que estudava",
+        "Propaganda na escola que estudava"
     ],
     "36. Porque você escolheu este curso?": [
         "Este curso forma profissionais facilmente absorvidos pelo mercado",
@@ -362,7 +362,7 @@ const respostasUtils: any = {
         "É um curso bem conceituado na região",
         "Porque já trabalho na área",
         "Sugestão ou vontade familiar",
-        "Outros motivos",
+        "Outros motivos"
     ],
     "37. Qual sua maior expectativa quanto ao curso?": [
         "Obter novos conhecimentos",
@@ -371,7 +371,7 @@ const respostasUtils: any = {
         "Melhorar-me como pessoa para bons relacionamentos futuros",
         "Obter um diploma de nível superior",
         "Outra expectativa",
-        "Não tenho expectativa alguma",
+        "Não tenho expectativa alguma"
     ],
     "38. Qual sua expectativa após se formar?": [
         "Conquistar vaga em empresa privada",
@@ -380,7 +380,7 @@ const respostasUtils: any = {
         "Abrir meu próprio negócio",
         "Ingressar na carreira acadêmica",
         "Outra expectativa",
-        "Nenhuma expectativa",
+        "Nenhuma expectativa"
     ],
     "39. Você já estudou nesta escola?": ["Sim", "Não"],
     "40. Você fez algum curso técnico?": [
@@ -388,7 +388,7 @@ const respostasUtils: any = {
         "Sim, em uma ETEC",
         "Sim, no SENAC",
         "Sim, no SENAI",
-        "Sim, em outra instituição",
+        "Sim, em outra instituição"
     ],
     "41. Qual o meio de transporte você usa para vir à escola?": [
         "Caminhando",
@@ -397,8 +397,8 @@ const respostasUtils: any = {
         "Moto",
         "Carro",
         "Ônibus",
-        "Transporte escolar",
-    ],
+        "Transporte escolar"
+    ]
 };
 
 export default respostasUtils;

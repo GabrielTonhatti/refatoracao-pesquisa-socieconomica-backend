@@ -17,7 +17,7 @@ class PerguntasDto {
         pergunta: string,
         respostas: RespostasDto,
         respostasMatutino: RespostasDto,
-        respostasNoturno: RespostasDto,
+        respostasNoturno: RespostasDto
     ): PerguntasDto {
         const perguntasDto: PerguntasDto = new PerguntasDto();
         perguntasDto.pergunta = pergunta;
