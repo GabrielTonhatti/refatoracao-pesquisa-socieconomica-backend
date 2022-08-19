@@ -7,7 +7,7 @@ const routes: Router = Router();
 routes.post(
     "/gerar-relatorio",
     multer().single("file"),
-    relatorioController.importarPlanilha
+    relatorioController.importarPlanilha,
 );
 
 export default routes;

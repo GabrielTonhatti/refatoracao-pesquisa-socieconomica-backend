@@ -9,11 +9,15 @@ class RelatorioController {
         req: Request,
         res: Response,
     ): Promise<Response<Array<RespostasResponse>>> {
-        const file: Express.Multer.File = <Express.Multer.File>req.file;
-        const response: Array<RelatorioResponse> | null =
-            await relatorioServer.importarPlanilha(file);
+        try {
+            const file: Express.Multer.File = <Express.Multer.File>req.file;
+            const response: Array<RelatorioResponse> | null =
+                await relatorioServer.importarPlanilha(file);
 
-        return res.json(response);
+            return res.json(response);
+        } catch (error: any) {
+            return res.status(404).json({ message: error.message });
+        }
     }
 }
 

@@ -1,17 +1,17 @@
 /* eslint-disable no-undef */
 import { Model, model, Types } from "mongoose";
+import { Logger } from "pino";
 import logger from "../config/logger";
 import PerguntasDto from "../dto/PerguntasDto";
-import RespostaDto from "../dto/RespostaDto";
+import RelatorioResponse from "../dto/RelatorioResponse";
 import RespostasDto from "../dto/RespostasDto";
+import { Errors } from "../enums/Errors";
+import { Turno } from "../enums/Turno";
 import Pergunta, { PerguntaInterface } from "../model/Pergunta";
 import { INDEX_PERGUNTA } from "../utils/constantes";
 import respostasUtils from "../utils/respostasUtils";
 import { PerguntasExcel } from "../utils/types/types";
 import planilhaServer from "./PlanilhaServer";
-import RelatorioResponse from "../dto/RelatorioResponse";
-import { Turno } from "../enums/Turno";
-import { Logger } from "pino";
 
 type PerguntaRepository = Model<PerguntaInterface, {}, {}, {}, any>;
 
@@ -33,6 +33,8 @@ class RelatorioServer {
         "Email Address",
     ];
 
+    private static readonly PRIMEIRA_PERGUNTA: string = "1. Qual o seu curso?";
+
     private static readonly SEPARADOR_PERGUNTA: string = ", ";
 
     private readonly repository: PerguntaRepository;
@@ -46,8 +48,12 @@ class RelatorioServer {
     public async importarPlanilha(
         file: Express.Multer.File,
     ): Promise<Array<RelatorioResponse> | null> {
-        const dadosPlanilhaConvertida: Array<PerguntasExcel> =
-            planilhaServer.converterPlanilha(file);
+        const dadosPlanilhaConvertida: Array<PerguntasExcel> = <
+            Array<PerguntasExcel>
+        >planilhaServer.converterPlanilha(file);
+
+        this.validarPlanilha(dadosPlanilhaConvertida);
+
         const perguntas: Array<string> = this.obterPerguntas(
             dadosPlanilhaConvertida,
         );
@@ -69,6 +75,7 @@ class RelatorioServer {
         dadosPlanilhaConvertida: Array<PerguntasExcel>,
     ): Promise<Array<RelatorioResponse> | null> {
         try {
+            this.log.info(`Salvando perguntas no banco de dados`);
             const perguntasModel: Array<PerguntaInterface> = [];
 
             perguntas.forEach((pergunta: string): void => {
@@ -153,9 +160,39 @@ class RelatorioServer {
         const respostasMongo: Array<string> = <Array<string>>(
             perguntaSchema?.respostas
         );
-        respostasGeral.preencherValoresIniciaisDeRespostas(respostasMongo);
-        respostasMatutino.preencherValoresIniciaisDeRespostas(respostasMongo);
-        respostasNoturno.preencherValoresIniciaisDeRespostas(respostasMongo);
+        const respostasSet: Set<string> = new Set<string>();
+        let respostasPossiveis: Array<string> = [];
+        let hasNotRespostaMongo: boolean = false;
+
+        if (this.isEmpty(respostasMongo)) {
+            this.obterRespostasPlanilha(
+                dadosPlanilhaConvertida,
+                respostasSet,
+                pergunta,
+            );
+            respostasPossiveis = Array.from(respostasSet).sort();
+
+            respostasGeral.preencherValoresIniciaisDeRespostas(
+                respostasPossiveis,
+            );
+            respostasMatutino.preencherValoresIniciaisDeRespostas(
+                respostasPossiveis,
+            );
+            respostasNoturno.preencherValoresIniciaisDeRespostas(
+                respostasPossiveis,
+            );
+            hasNotRespostaMongo = true;
+        } else {
+            respostasGeral.preencherValoresIniciaisDeRespostas(respostasMongo);
+            respostasMatutino.preencherValoresIniciaisDeRespostas(
+                respostasMongo,
+            );
+            respostasNoturno.preencherValoresIniciaisDeRespostas(
+                respostasMongo,
+            );
+
+            hasNotRespostaMongo = false;
+        }
 
         this.processamentoDeRespostas(
             dadosPlanilhaConvertida,
@@ -163,7 +200,9 @@ class RelatorioServer {
             respostasGeral,
             respostasMatutino,
             respostasNoturno,
-            perguntaSchema,
+            respostasMongo,
+            respostasPossiveis,
+            hasNotRespostaMongo,
         );
 
         respostasGeral.removerLabelsSemResposta();
@@ -177,7 +216,9 @@ class RelatorioServer {
         respostasGeral: RespostasDto,
         respostasMatutino: RespostasDto,
         respostasNoturno: RespostasDto,
-        perguntaSchema: PerguntaSchema | null,
+        respostasMongo: Array<string>,
+        respostasPossiveis: Array<string>,
+        hasNotRespostaMongo: boolean,
     ): void {
         dadosPlanilhaConvertida.forEach((dados: PerguntasExcel): void => {
             const turno: string =
@@ -189,29 +230,16 @@ class RelatorioServer {
 
             if (respostaPlanilha !== undefined) {
                 const resposta: string = respostaPlanilha.toString();
-                const respostasMongo: Array<string> = <Array<string>>(
-                    perguntaSchema?.respostas
-                );
 
-                if (this.isEmpty(respostasMongo)) {
-                    // TODO: Calcular respostas que não foram cadastradas no banco
-
-                    if (this.isEmpty(respostasGeral.respostas)) {
-                        respostasGeral.respostas.push(
-                            RespostaDto.ofWithData(resposta, 1),
-                        );
-                    } else {
-                        respostasGeral.respostas.forEach(
-                            (respostaDto: RespostaDto): void => {
-                                if (respostaDto.resposta === resposta) {
-                                    respostaDto.data++;
-                                } else {
-                                    respostaDto.resposta = resposta;
-                                    respostaDto.data = 1;
-                                }
-                            },
-                        );
-                    }
+                if (hasNotRespostaMongo) {
+                    this.validarRespostasMongo(
+                        respostasPossiveis,
+                        resposta,
+                        turno,
+                        respostasGeral,
+                        respostasMatutino,
+                        respostasNoturno,
+                    );
                 } else {
                     this.validarRespostasMongo(
                         respostasMongo,
@@ -227,34 +255,56 @@ class RelatorioServer {
     }
 
     private validarRespostasMongo(
-        respostasMongo: string[],
+        respostas: Array<string>,
         resposta: string,
         turno: string,
         respostasGeral: RespostasDto,
         respostasMatutino: RespostasDto,
         respostasNoturno: RespostasDto,
     ): void {
-        respostasMongo.forEach((respostaSchema: string): void => {
-            resposta
-                .split(RelatorioServer.SEPARADOR_PERGUNTA)
-                .forEach((resp: string): void => {
-                    if (resp === respostaSchema) {
-                        const index: number = this.obterIndexPergunta(
-                            respostasGeral,
-                            respostaSchema,
-                        );
-                        respostasGeral.incrementarData(index);
+        Array.from(respostas)
+            .filter(
+                (respostaAtual: string): boolean => respostaAtual !== undefined,
+            )
+            .forEach((respostaAtual: string): void => {
+                resposta
+                    .split(RelatorioServer.SEPARADOR_PERGUNTA)
+                    .forEach((resp: string): void => {
+                        if (resp === respostaAtual.toString()) {
+                            const index: number = this.obterIndexPergunta(
+                                respostasGeral,
+                                respostaAtual,
+                            );
+                            respostasGeral.incrementarData(index);
 
-                        switch (turno) {
-                            case Turno.MATUTINO:
-                                respostasMatutino.incrementarData(index);
-                                break;
-                            case Turno.NOTURNO:
-                                respostasNoturno.incrementarData(index);
-                                break;
+                            switch (turno) {
+                                case Turno.MATUTINO:
+                                    respostasMatutino.incrementarData(index);
+                                    break;
+                                case Turno.NOTURNO:
+                                    respostasNoturno.incrementarData(index);
+                                    break;
+                            }
                         }
-                    }
-                });
+                    });
+            });
+    }
+
+    private obterRespostasPlanilha(
+        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+        respostas: Set<string>,
+        pergunta: string,
+    ): void {
+        dadosPlanilhaConvertida.forEach((dados: PerguntasExcel): void => {
+            const resposta: string = dados[pergunta as keyof PerguntasExcel];
+            const numero: number = Number(resposta);
+
+            if (!isNaN(numero)) {
+                respostas.add(numero.toString());
+                dados[pergunta as keyof PerguntasExcel] = numero.toString();
+            } else {
+                respostas.add(resposta);
+            }
         });
     }
 
@@ -279,6 +329,26 @@ class RelatorioServer {
 
     private isEmpty(obj: Array<any>): boolean {
         return obj.length === 0;
+    }
+
+    private validarPlanilha(
+        dadosPlanilhaConvertida: Array<PerguntasExcel>,
+    ): void {
+        if (this.isEmpty(dadosPlanilhaConvertida)) {
+            throw new Error(Errors.ERRO_PLANILHA_VAZIA);
+        }
+
+        const primeiraPergunta: string =
+            dadosPlanilhaConvertida[0][
+                RelatorioServer.PRIMEIRA_PERGUNTA as keyof PerguntasExcel
+            ];
+
+        if (
+            dadosPlanilhaConvertida === null ||
+            primeiraPergunta === undefined
+        ) {
+            throw new Error(Errors.ERRO_PLANILHA_INVALIDA);
+        }
     }
 }
 

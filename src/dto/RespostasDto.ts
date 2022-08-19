@@ -47,7 +47,9 @@ class RespostasDto {
         }
     }
 
-    public preencherValoresIniciaisDeRespostas(labels: Array<string>): void {
+    public preencherValoresIniciaisDeRespostas(
+        labels: Array<string>,
+    ): void {
         const respostas: Array<RespostaDto> = [];
 
         this.labels = labels;
