@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import { Model, model, Types } from "mongoose";
 import { Logger } from "pino";
+import utils from "../utils/utils";
 import logger from "../config/logger";
 import PerguntasDto from "../dto/PerguntasDto";
 import RelatorioResponse from "../dto/RelatorioResponse";
@@ -170,7 +171,8 @@ class RelatorioServer {
                 respostasSet,
                 pergunta,
             );
-            respostasPossiveis = Array.from(respostasSet).sort();
+            // FIXME: Concerta método de ordenação do array
+            respostasPossiveis = utils.ordenarArray(Array.from(respostasSet));
 
             respostasGeral.preencherValoresIniciaisDeRespostas(
                 respostasPossiveis,
@@ -262,10 +264,7 @@ class RelatorioServer {
         respostasMatutino: RespostasDto,
         respostasNoturno: RespostasDto,
     ): void {
-        Array.from(respostas)
-            .filter(
-                (respostaAtual: string): boolean => respostaAtual !== undefined,
-            )
+        respostas
             .forEach((respostaAtual: string): void => {
                 resposta
                     .split(RelatorioServer.SEPARADOR_PERGUNTA)
