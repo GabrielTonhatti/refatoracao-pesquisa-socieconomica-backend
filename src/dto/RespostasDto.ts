@@ -52,7 +52,7 @@ class RespostasDto {
     ): void {
         const respostas: Array<RespostaDto> = [];
 
-        this.labels = labels;
+        this.labels = labels.map((label: string): string => label.toString().trim());
         this.labels.forEach((label: string): void => {
             this.data.push(0);
             respostas.push(RespostaDto.of(label));

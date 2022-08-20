@@ -274,10 +274,15 @@ class RelatorioServer {
             resposta
                 .split(RelatorioServer.SEPARADOR_PERGUNTA)
                 .forEach((resp: string): void => {
-                    if (resp === respostaAtual.toString()) {
+                    const respostaFormatada: string = respostaAtual
+                        .toString()
+                        .trim();
+                    const respFormatada: string = resp.toString().trim();
+
+                    if (respFormatada === respostaFormatada) {
                         const index: number = this.obterIndexPergunta(
                             respostasGeral,
-                            respostaAtual
+                            respostaFormatada
                         );
                         respostasGeral.incrementarData(index);
 
