@@ -124,12 +124,13 @@ class RelatorioServer {
                     await this.repository.findOne({
                         pergunta: perguntaFormatada
                     });
-
+                const schema: PerguntaSchema = <PerguntaSchema>perguntaSchema;
                 const respostasGeral: RespostasDto = new RespostasDto();
                 const respostasMatutino: RespostasDto = new RespostasDto();
                 const respostasNoturno: RespostasDto = new RespostasDto();
+
                 this.preencherRespostas(
-                    perguntaSchema,
+                    schema,
                     respostasGeral,
                     respostasMatutino,
                     respostasNoturno,
@@ -137,7 +138,6 @@ class RelatorioServer {
                     pergunta
                 );
 
-                const schema: PerguntaSchema = <PerguntaSchema>perguntaSchema;
                 const perguntaDto: PerguntasDto = PerguntasDto.of(
                     schema.pergunta,
                     respostasGeral,
@@ -158,19 +158,17 @@ class RelatorioServer {
     }
 
     private preencherRespostas(
-        perguntaSchema: PerguntaSchema | null,
+        perguntaSchema: PerguntaSchema,
         respostasGeral: RespostasDto,
         respostasMatutino: RespostasDto,
         respostasNoturno: RespostasDto,
         dadosPlanilhaConvertida: PerguntasExcel[],
         pergunta: string
     ): void {
-        const respostasMongo: Array<string> = <Array<string>>(
-            perguntaSchema?.respostas
+        let respostasMongo: Array<string> = <Array<string>>(
+            perguntaSchema.respostas
         );
         const respostasSet: Set<string> = new Set<string>();
-        let respostasPossiveis: Array<string> = [];
-        let hasNotRespostaMongo: boolean = false;
 
         if (this.isEmpty(respostasMongo)) {
             this.obterRespostasPlanilha(
@@ -178,29 +176,17 @@ class RelatorioServer {
                 respostasSet,
                 pergunta
             );
-            respostasPossiveis = utils.ordenarArray(Array.from(respostasSet));
+            perguntaSchema.respostas = utils.ordenarArray(
+                Array.from(respostasSet)
+            );
+            respostasMongo = perguntaSchema.respostas;
 
-            respostasGeral.preencherValoresIniciaisDeRespostas(
-                respostasPossiveis
-            );
-            respostasMatutino.preencherValoresIniciaisDeRespostas(
-                respostasPossiveis
-            );
-            respostasNoturno.preencherValoresIniciaisDeRespostas(
-                respostasPossiveis
-            );
-            hasNotRespostaMongo = true;
-        } else {
-            respostasGeral.preencherValoresIniciaisDeRespostas(respostasMongo);
-            respostasMatutino.preencherValoresIniciaisDeRespostas(
-                respostasMongo
-            );
-            respostasNoturno.preencherValoresIniciaisDeRespostas(
-                respostasMongo
-            );
-
-            hasNotRespostaMongo = false;
+            perguntaSchema.save();
         }
+
+        respostasGeral.preencherValoresIniciaisDeRespostas(respostasMongo);
+        respostasMatutino.preencherValoresIniciaisDeRespostas(respostasMongo);
+        respostasNoturno.preencherValoresIniciaisDeRespostas(respostasMongo);
 
         this.processamentoDeRespostas(
             dadosPlanilhaConvertida,
@@ -208,9 +194,7 @@ class RelatorioServer {
             respostasGeral,
             respostasMatutino,
             respostasNoturno,
-            respostasMongo,
-            respostasPossiveis,
-            hasNotRespostaMongo
+            respostasMongo
         );
 
         respostasGeral.removerLabelsSemResposta();
@@ -224,9 +208,7 @@ class RelatorioServer {
         respostasGeral: RespostasDto,
         respostasMatutino: RespostasDto,
         respostasNoturno: RespostasDto,
-        respostasMongo: Array<string>,
-        respostasPossiveis: Array<string>,
-        hasNotRespostaMongo: boolean
+        respostasMongo: Array<string>
     ): void {
         dadosPlanilhaConvertida.forEach((dados: PerguntasExcel): void => {
             const turno: string =
@@ -239,30 +221,19 @@ class RelatorioServer {
             if (respostaPlanilha !== undefined) {
                 const resposta: string = respostaPlanilha.toString();
 
-                if (hasNotRespostaMongo) {
-                    this.validarRespostasMongo(
-                        respostasPossiveis,
-                        resposta,
-                        turno,
-                        respostasGeral,
-                        respostasMatutino,
-                        respostasNoturno
-                    );
-                } else {
-                    this.validarRespostasMongo(
-                        respostasMongo,
-                        resposta,
-                        turno,
-                        respostasGeral,
-                        respostasMatutino,
-                        respostasNoturno
-                    );
-                }
+                this.validarRespostas(
+                    respostasMongo,
+                    resposta,
+                    turno,
+                    respostasGeral,
+                    respostasMatutino,
+                    respostasNoturno
+                );
             }
         });
     }
 
-    private validarRespostasMongo(
+    private validarRespostas(
         respostas: Array<string>,
         resposta: string,
         turno: string,
