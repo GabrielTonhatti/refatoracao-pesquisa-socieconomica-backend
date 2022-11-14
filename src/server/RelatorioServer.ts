@@ -36,7 +36,8 @@ class RelatorioServer {
     ];
 
     private static readonly TIPO_ARQUIVOS_PERMITIDOS: Array<string> = [
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/wps-office.xlsx"
     ];
 
     private static readonly PRIMEIRA_PERGUNTA: string = "1. Qual o seu curso?";
